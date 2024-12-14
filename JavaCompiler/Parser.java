@@ -56,20 +56,21 @@ class Parser{
 		
 	}
 
-	Operador Op () throws Exception
-		{
-		
+	Operador Op() throws Exception {
 		Token tokenCorrente = scanner.getNextToken();
-		switch(tokenCorrente.token){
+		switch (tokenCorrente.token) {
 			case SOMA:
-				return new Soma(null,null);
+				return new Soma(null, null);
 			case MULT:
-				return new Mult(null,null);
-			default: 
+				return new Mult(null, null);
+			case SUB:
+				return new Sub(null, null);
+			case DIV:
+				return new Div(null, null);
+			default:
+				throw new Exception("Operador inválido: " + tokenCorrente.lexema);
 		}
-		return null;
-			
-
-		}
+	}
+	
 
 }

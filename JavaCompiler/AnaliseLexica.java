@@ -1,6 +1,6 @@
 import java.io.*;
 
-enum TokenType { NUM, SOMA, MULT, APar, FPar, EOF }
+enum TokenType { NUM, SOMA, MULT, SUB, DIV, APar, FPar, EOF }
 
 class Token {
     String lexema; // Alterado para String para suportar números com mais de um dígito
@@ -37,6 +37,8 @@ class AnaliseLexica {
             currchar = (char) currchar1;
         } while (currchar == '\n' || currchar == ' ' || currchar == '\t' || currchar == '\r');
 
+		// System.out.println("caractere lido: '" + currchar + "' (ASCII: " + ((int) currchar) + ")");
+
         if (currchar1 != eof && currchar1 != 10) {
             // Verifica se o caractere atual é um dígito
             if (currchar >= '0' && currchar <= '9') {
@@ -58,19 +60,23 @@ class AnaliseLexica {
                 return new Token(numero.toString(), TokenType.NUM);
             } else {
                 // Identificar outros tokens
-                switch (currchar) {
-                    case '(':
-                        return new Token(String.valueOf(currchar), TokenType.APar);
-                    case ')':
-                        return new Token(String.valueOf(currchar), TokenType.FPar);
-                    case '+':
-                        return new Token(String.valueOf(currchar), TokenType.SOMA);
-                    case '*':
-                        return new Token(String.valueOf(currchar), TokenType.MULT);
-                    default:
-                        throw new Exception("Caractere inválido: " + ((int) currchar));
-                }
-            }
+				switch (currchar) {
+					case '(':
+						return new Token(String.valueOf(currchar), TokenType.APar);
+					case ')':
+						return new Token(String.valueOf(currchar), TokenType.FPar);
+					case '+':
+						return new Token(String.valueOf(currchar), TokenType.SOMA);
+					case '*':
+						return new Token(String.valueOf(currchar), TokenType.MULT);
+					case '-':
+						return new Token(String.valueOf(currchar), TokenType.SUB);
+					case '/':
+						return new Token(String.valueOf(currchar), TokenType.DIV);
+					default:
+					throw new Exception("Caractere inválido: " + currchar + " (ASCII: " + ((int) currchar) + ")");
+				}
+			}		
         }
 
         arquivo.close();
