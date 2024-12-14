@@ -10,11 +10,16 @@ class Compilador{
 			Parser as = new Parser(al);
 		
 			arv = as.parseProg();
-		
 			
+			//gerador de codigo
 			CodeGen backend = new CodeGen();
 			String codigo = backend.geraCodigo(arv);
 			System.out.println(codigo);
+
+			//interpretador
+			Interpreter interpretador = new Interpreter();
+			int resultado = interpretador.interpreta(arv);
+			System.out.println("Resultado: " + resultado);
 
 		}catch(Exception e)
 		{			
