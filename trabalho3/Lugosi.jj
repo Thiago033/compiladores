@@ -22,18 +22,43 @@ TOKEN :
   <MAIN: "main"> |
   <LET: "let"> |
   <FLOAT: "float"> |
+  <BOOL: "bool"> |
+  <TRUE: "true"> |
+  <FALSE: "false"> |
+  <RETURN: "return"> |
   <PRINTIO: "printIO"> |
+  <READIO: "readIO"> |
+  <IF: "if"> |
+  <WHILE: "while"> |
+  <DO: "do"> |
+  <DEF: "def"> |
+
+  // Operadores
+  <PLUS: "+"> |
+  <MINUS: "-"> |
+  <MULT: "*"> |
+  <DIV: "/"> |
+  <AND: "&&"> |
+  <OR: "||"> |
+  <LT: "<"> |
+  <GT: ">"> |
+  <EQ: "=="> |
 
   // Símbolos
   <ACHAVES: "{"> |
   <FCHAVES: "}"> |
+  <APAREN: "("> |
+  <FPAREN: ")"> |
+  <VIRGULA: ","> |
   <PONTOVIRGULA: ";"> |
   <ATRIBUICAO: ":="> |
 
   // Literais
   <NUM: (["0"-"9"])+("."(["0"-"9"])+)? > | // Número inteiro ou decimal
   <ID: ["a"-"z", "A"-"Z"] (["a"-"z", "A"-"Z", "0"-"9"])* > // Identificadores
+
 }
+
 
 void Lugosi() :
 { Token t; }
@@ -43,9 +68,30 @@ void Lugosi() :
     <MAIN> { System.out.println("Palavra reservada: main"); } |
     <LET> { System.out.println("Palavra reservada: let"); } |
     <FLOAT> { System.out.println("Palavra reservada: float"); } |
+    <BOOL> { System.out.println("Palavra reservada: bool"); } |
+    <TRUE> { System.out.println("Palavra reservada: true"); } |
+    <FALSE> { System.out.println("Palavra reservada: false"); } |
+    <RETURN> { System.out.println("Palavra reservada: return"); } |
     <PRINTIO> { System.out.println("Palavra reservada: printIO"); } |
+    <READIO> { System.out.println("Palavra reservada: readIO"); } |
+    <IF> { System.out.println("Palavra reservada: if"); } |
+    <WHILE> { System.out.println("Palavra reservada: while"); } |
+    <DO> { System.out.println("Palavra reservada: do"); } |
+    <DEF> { System.out.println("Palavra reservada: def"); } |
+    <PLUS> { System.out.println("Operador: +"); } |
+    <MINUS> { System.out.println("Operador: -"); } |
+    <MULT> { System.out.println("Operador: *"); } |
+    <DIV> { System.out.println("Operador: /"); } |
+    <AND> { System.out.println("Operador lógico: &&"); } |
+    <OR> { System.out.println("Operador lógico: ||"); } |
+    <LT> { System.out.println("Operador relacional: <"); } |
+    <GT> { System.out.println("Operador relacional: >"); } |
+    <EQ> { System.out.println("Operador relacional: =="); } |
     <ACHAVES> { System.out.println("Abre chaves: {"); } |
     <FCHAVES> { System.out.println("Fecha chaves: }"); } |
+    <APAREN> { System.out.println("Abre parênteses: ("); } |
+    <FPAREN> { System.out.println("Fecha parênteses: )"); } |
+    <VIRGULA> { System.out.println("Vírgula: ,"); } |
     <PONTOVIRGULA> { System.out.println("Ponto e vírgula: ;"); } |
     <ATRIBUICAO> { System.out.println("Atribuição: :="); } |
     t=<NUM> { System.out.println("Número: " + t.image); } |
