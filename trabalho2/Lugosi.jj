@@ -2,60 +2,54 @@ PARSER_BEGIN(Lugosi)
 import java.io.*;
 public class Lugosi {
 
-  public static void main(String args[]) throws ParseException,IOException {
-    
- Lugosi analisador = new Lugosi(new FileInputStream(args[0]));
- analisador.Lugosi();
+  public static void main(String args[]) throws ParseException, IOException {
+    Lugosi analisador = new Lugosi(new FileInputStream(args[0]));
+    analisador.Lugosi();
   }
 
 }
-
 PARSER_END(Lugosi)
 
 SKIP :
 {
-  " "
-| "\t"
-| "\n"
-| "\r"
+  " " | "\t" | "\n" | "\r"
 }
 
 TOKEN :
 {
-  <MAIN: "main">
-| <ACHAVES: "{">
-| <FCHAVES: "}">
-| <VOID: "void">
+  // Palavras reservadas
+  <VOID: "void"> |
+  <MAIN: "main"> |
+  <LET: "let"> |
+  <FLOAT: "float"> |
+  <PRINTIO: "printIO"> |
 
+  // Símbolos
+  <ACHAVES: "{"> |
+  <FCHAVES: "}"> |
+  <PONTOVIRGULA: ";"> |
+  <ATRIBUICAO: ":="> |
+
+  // Literais
+  <NUM: (["0"-"9"])+("."(["0"-"9"])+)? > | // Número inteiro ou decimal
+  <ID: ["a"-"z", "A"-"Z"] (["a"-"z", "A"-"Z", "0"-"9"])* > // Identificadores
 }
 
-TOKEN :
+void Lugosi() :
+{ Token t; }
 {
-  <NUM : (["0"-"9"])+>
- |< ID: ["a"-"z","A"-"Z"] ( ["a"-"z","A"-"Z","0"-"9"])*>
-
+  (
+    <VOID> { System.out.println("Palavra reservada: void"); } |
+    <MAIN> { System.out.println("Palavra reservada: main"); } |
+    <LET> { System.out.println("Palavra reservada: let"); } |
+    <FLOAT> { System.out.println("Palavra reservada: float"); } |
+    <PRINTIO> { System.out.println("Palavra reservada: printIO"); } |
+    <ACHAVES> { System.out.println("Abre chaves: {"); } |
+    <FCHAVES> { System.out.println("Fecha chaves: }"); } |
+    <PONTOVIRGULA> { System.out.println("Ponto e vírgula: ;"); } |
+    <ATRIBUICAO> { System.out.println("Atribuição: :="); } |
+    t=<NUM> { System.out.println("Número: " + t.image); } |
+    t=<ID> { System.out.println("Identificador: " + t.image); }
+  )*
+  <EOF>
 }
-
-
-
-void Lugosi () :
-{Token t;}
-{
-
-(
-  <MAIN> { System.out.println("Palavra reservada: main");}
-| <ACHAVES> { System.out.println("Abre chaves: {");}
-| <FCHAVES> { System.out.println("Fecha chaves: }");}
-| <VOID> { System.out.println("Palavra reservada: void");}  
-| t=<NUM> { System.out.println("Número: "+ t.image);}
-| t=<ID> { System.out.println("Identificador: "+ t.image);}
-)*
-<EOF> 
-
-
-}
-
-
-
-
-
