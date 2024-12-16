@@ -1,0 +1,11 @@
+void main {
+  let float num1;
+  let float num2;
+  let float resultado;
+
+  num1 := 5.0;
+  num2 := 3.0;
+  resultado := num1 + num2;
+
+  printIO resultado;
+}
