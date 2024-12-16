@@ -14,10 +14,17 @@ class Operador extends Exp{
 }
 
 class Soma extends Operador{
-	
 	Soma (Exp a1, Exp a2) { super(a1,a2);}
 }
 
 class Mult extends Operador{
 	Mult (Exp a1, Exp a2) { super(a1,a2);}
+}
+
+class Sub extends Operador {
+    Sub(Exp a1, Exp a2) { super(a1, a2); }
+}
+
+class Div extends Operador {
+    Div(Exp a1, Exp a2) { super(a1, a2); }
 }

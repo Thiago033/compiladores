@@ -1,6 +1,0 @@
-1 - modificar lexica/ representacao do token, modificar loop da analise lexica / retornar ultimo caracter para o buffer / junta em uma string e converte em int e manda
-2 - modificar todas as fases
-3 - modificar busca em profundidade para computer os valores da arvore
-4 - programa 100% novo / qualquer linguagem
-5 - S3 para levar e trazer mensagens
-seguir a ordem dos exercicios
