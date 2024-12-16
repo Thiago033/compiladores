@@ -2,8 +2,8 @@ void main {
   let float celsius;
   let float fahrenheit;
 
-  celsius := 25.0; // Valor inicial em Celsius
-  fahrenheit := (celsius * 9.0 / 5.0) + 32.0;
+  celsius := 25.0;
+  fahrenheit := (celsius * 9.0 + 5.0) + 32.0;
 
   printIO fahrenheit;
 }

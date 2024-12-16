@@ -16,9 +16,30 @@ public class Lugosi implements LugosiConstants {
       case MAIN:
       case LET:
       case FLOAT:
+      case BOOL:
+      case TRUE:
+      case FALSE:
+      case RETURN:
       case PRINTIO:
+      case READIO:
+      case IF:
+      case WHILE:
+      case DO:
+      case DEF:
+      case PLUS:
+      case MINUS:
+      case MULT:
+      case DIV:
+      case AND:
+      case OR:
+      case LT:
+      case GT:
+      case EQ:
       case ACHAVES:
       case FCHAVES:
+      case APAREN:
+      case FPAREN:
+      case VIRGULA:
       case PONTOVIRGULA:
       case ATRIBUICAO:
       case NUM:
@@ -46,9 +67,81 @@ public class Lugosi implements LugosiConstants {
         jj_consume_token(FLOAT);
               System.out.println("Palavra reservada: float");
         break;
+      case BOOL:
+        jj_consume_token(BOOL);
+             System.out.println("Palavra reservada: bool");
+        break;
+      case TRUE:
+        jj_consume_token(TRUE);
+             System.out.println("Palavra reservada: true");
+        break;
+      case FALSE:
+        jj_consume_token(FALSE);
+              System.out.println("Palavra reservada: false");
+        break;
+      case RETURN:
+        jj_consume_token(RETURN);
+               System.out.println("Palavra reservada: return");
+        break;
       case PRINTIO:
         jj_consume_token(PRINTIO);
                 System.out.println("Palavra reservada: printIO");
+        break;
+      case READIO:
+        jj_consume_token(READIO);
+               System.out.println("Palavra reservada: readIO");
+        break;
+      case IF:
+        jj_consume_token(IF);
+           System.out.println("Palavra reservada: if");
+        break;
+      case WHILE:
+        jj_consume_token(WHILE);
+              System.out.println("Palavra reservada: while");
+        break;
+      case DO:
+        jj_consume_token(DO);
+           System.out.println("Palavra reservada: do");
+        break;
+      case DEF:
+        jj_consume_token(DEF);
+            System.out.println("Palavra reservada: def");
+        break;
+      case PLUS:
+        jj_consume_token(PLUS);
+             System.out.println("Operador: +");
+        break;
+      case MINUS:
+        jj_consume_token(MINUS);
+              System.out.println("Operador: -");
+        break;
+      case MULT:
+        jj_consume_token(MULT);
+             System.out.println("Operador: *");
+        break;
+      case DIV:
+        jj_consume_token(DIV);
+            System.out.println("Operador: /");
+        break;
+      case AND:
+        jj_consume_token(AND);
+            System.out.println("Operador l\u00f3gico: &&");
+        break;
+      case OR:
+        jj_consume_token(OR);
+           System.out.println("Operador l\u00f3gico: ||");
+        break;
+      case LT:
+        jj_consume_token(LT);
+           System.out.println("Operador relacional: <");
+        break;
+      case GT:
+        jj_consume_token(GT);
+           System.out.println("Operador relacional: >");
+        break;
+      case EQ:
+        jj_consume_token(EQ);
+           System.out.println("Operador relacional: ==");
         break;
       case ACHAVES:
         jj_consume_token(ACHAVES);
@@ -57,6 +150,18 @@ public class Lugosi implements LugosiConstants {
       case FCHAVES:
         jj_consume_token(FCHAVES);
                 System.out.println("Fecha chaves: }");
+        break;
+      case APAREN:
+        jj_consume_token(APAREN);
+               System.out.println("Abre par\u00eanteses: (");
+        break;
+      case FPAREN:
+        jj_consume_token(FPAREN);
+               System.out.println("Fecha par\u00eanteses: )");
+        break;
+      case VIRGULA:
+        jj_consume_token(VIRGULA);
+                System.out.println("V\u00edrgula: ,");
         break;
       case PONTOVIRGULA:
         jj_consume_token(PONTOVIRGULA);
@@ -95,11 +200,16 @@ public class Lugosi implements LugosiConstants {
   static private int jj_gen;
   static final private int[] jj_la1 = new int[2];
   static private int[] jj_la1_0;
+  static private int[] jj_la1_1;
   static {
       jj_la1_init_0();
+      jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0xffe0,0xffe0,};
+      jj_la1_0 = new int[] {0xffffffe0,0xffffffe0,};
+   }
+   private static void jj_la1_init_1() {
+      jj_la1_1 = new int[] {0x1f,0x1f,};
    }
 
   /** Constructor with InputStream. */
@@ -237,7 +347,7 @@ public class Lugosi implements LugosiConstants {
   /** Generate ParseException. */
   static public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[16];
+    boolean[] la1tokens = new boolean[37];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
@@ -248,10 +358,13 @@ public class Lugosi implements LugosiConstants {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
             la1tokens[j] = true;
           }
+          if ((jj_la1_1[i] & (1<<j)) != 0) {
+            la1tokens[32+j] = true;
+          }
         }
       }
     }
-    for (int i = 0; i < 16; i++) {
+    for (int i = 0; i < 37; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;
