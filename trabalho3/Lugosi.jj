@@ -1,20 +1,27 @@
 PARSER_BEGIN(Lugosi)
+
 import java.io.*;
 public class Lugosi {
-
   public static void main(String args[]) throws ParseException, IOException {
     Lugosi analisador = new Lugosi(new FileInputStream(args[0]));
-    analisador.Lugosi();
+    try {
+      analisador.Programa();
+      System.out.println("Programa analisado com sucesso.");
+    } catch (ParseException e) {
+      System.out.println("Erro de parsing: " + e.getMessage());
+    }
   }
-
 }
+
 PARSER_END(Lugosi)
 
+// Ignorar espaços, tabulações e quebras de linha
 SKIP :
 {
   " " | "\t" | "\n" | "\r"
 }
 
+// ----------------- Definição de Tokens -----------------
 TOKEN :
 {
   // Palavras reservadas
@@ -56,46 +63,90 @@ TOKEN :
   // Literais
   <NUM: (["0"-"9"])+("."(["0"-"9"])+)? > | // Número inteiro ou decimal
   <ID: ["a"-"z", "A"-"Z"] (["a"-"z", "A"-"Z", "0"-"9"])* > // Identificadores
-
 }
 
+// ------------------ Regras da Linguagem ------------------
 
-void Lugosi() :
-{ Token t; }
+// PROGRAMA -> "void" "main" "{" COMANDOS "}"
+void Programa() :
+{}
 {
-  (
-    <VOID> { System.out.println("Palavra reservada: void"); } |
-    <MAIN> { System.out.println("Palavra reservada: main"); } |
-    <LET> { System.out.println("Palavra reservada: let"); } |
-    <FLOAT> { System.out.println("Palavra reservada: float"); } |
-    <BOOL> { System.out.println("Palavra reservada: bool"); } |
-    <TRUE> { System.out.println("Palavra reservada: true"); } |
-    <FALSE> { System.out.println("Palavra reservada: false"); } |
-    <RETURN> { System.out.println("Palavra reservada: return"); } |
-    <PRINTIO> { System.out.println("Palavra reservada: printIO"); } |
-    <READIO> { System.out.println("Palavra reservada: readIO"); } |
-    <IF> { System.out.println("Palavra reservada: if"); } |
-    <WHILE> { System.out.println("Palavra reservada: while"); } |
-    <DO> { System.out.println("Palavra reservada: do"); } |
-    <DEF> { System.out.println("Palavra reservada: def"); } |
-    <PLUS> { System.out.println("Operador: +"); } |
-    <MINUS> { System.out.println("Operador: -"); } |
-    <MULT> { System.out.println("Operador: *"); } |
-    <DIV> { System.out.println("Operador: /"); } |
-    <AND> { System.out.println("Operador lógico: &&"); } |
-    <OR> { System.out.println("Operador lógico: ||"); } |
-    <LT> { System.out.println("Operador relacional: <"); } |
-    <GT> { System.out.println("Operador relacional: >"); } |
-    <EQ> { System.out.println("Operador relacional: =="); } |
-    <ACHAVES> { System.out.println("Abre chaves: {"); } |
-    <FCHAVES> { System.out.println("Fecha chaves: }"); } |
-    <APAREN> { System.out.println("Abre parênteses: ("); } |
-    <FPAREN> { System.out.println("Fecha parênteses: )"); } |
-    <VIRGULA> { System.out.println("Vírgula: ,"); } |
-    <PONTOVIRGULA> { System.out.println("Ponto e vírgula: ;"); } |
-    <ATRIBUICAO> { System.out.println("Atribuição: :="); } |
-    t=<NUM> { System.out.println("Número: " + t.image); } |
-    t=<ID> { System.out.println("Identificador: " + t.image); }
-  )*
-  <EOF>
+  <VOID> <MAIN> <ACHAVES> Comandos() <FCHAVES> <EOF>
+}
+
+// COMANDOS -> COM ";" COMANDOS'
+void Comandos() :
+{}
+{
+  Com() <PONTOVIRGULA> ComandosL()
+}
+
+// COMANDOS' -> COM ";" COMANDOS' | ε
+void ComandosL() :
+{}
+{
+  (Com() <PONTOVIRGULA> ComandosL())?
+}
+
+// COM -> DECLARACAO | ATRIBUICAO | PRINT
+void Com() :
+{}
+{
+  Declaracao() | Atribuicao() | Print()
+}
+
+// DECLARACAO -> "let" ("float" | "bool") ID
+void Declaracao() :
+{}
+{
+  <LET> ( <FLOAT> | <BOOL> ) <ID>
+}
+
+// ATRIBUICAO -> ID ":=" EXP
+void Atribuicao() :
+{}
+{
+  <ID> <ATRIBUICAO> Exp()
+}
+
+// PRINT -> "printIO" "(" EXP ")" | "printIO" ID
+void Print() :
+{}
+{
+  <PRINTIO> ( <APAREN> Exp() <FPAREN> | <ID> )
+}
+
+// EXPRESSÃO -> TERMO EXP'
+void Exp() :
+{}
+{
+  Termo() ExpL()
+}
+
+// EXP' -> ("+" | "-") TERMO EXP' | ε
+void ExpL() :
+{}
+{
+  ( ( <PLUS> | <MINUS> ) Termo() ExpL() )?
+}
+
+// TERMO -> FATOR TERMO'
+void Termo() :
+{}
+{
+  Fator() TermoL()
+}
+
+// TERMO' -> ("*" | "/") FATOR TERMO' | ε
+void TermoL() :
+{}
+{
+  ( ( <MULT> | <DIV> ) Fator() TermoL() )?
+}
+
+// FATOR -> NUM | ID | "(" EXP ")"
+void Fator() :
+{}
+{
+  <NUM> | <ID> | ( <APAREN> Exp() <FPAREN> )
 }

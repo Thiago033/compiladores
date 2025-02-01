@@ -17,19 +17,61 @@ public interface LugosiConstants {
   /** RegularExpression Id. */
   int FLOAT = 8;
   /** RegularExpression Id. */
-  int PRINTIO = 9;
+  int BOOL = 9;
   /** RegularExpression Id. */
-  int ACHAVES = 10;
+  int TRUE = 10;
   /** RegularExpression Id. */
-  int FCHAVES = 11;
+  int FALSE = 11;
   /** RegularExpression Id. */
-  int PONTOVIRGULA = 12;
+  int RETURN = 12;
   /** RegularExpression Id. */
-  int ATRIBUICAO = 13;
+  int PRINTIO = 13;
   /** RegularExpression Id. */
-  int NUM = 14;
+  int READIO = 14;
   /** RegularExpression Id. */
-  int ID = 15;
+  int IF = 15;
+  /** RegularExpression Id. */
+  int WHILE = 16;
+  /** RegularExpression Id. */
+  int DO = 17;
+  /** RegularExpression Id. */
+  int DEF = 18;
+  /** RegularExpression Id. */
+  int PLUS = 19;
+  /** RegularExpression Id. */
+  int MINUS = 20;
+  /** RegularExpression Id. */
+  int MULT = 21;
+  /** RegularExpression Id. */
+  int DIV = 22;
+  /** RegularExpression Id. */
+  int AND = 23;
+  /** RegularExpression Id. */
+  int OR = 24;
+  /** RegularExpression Id. */
+  int LT = 25;
+  /** RegularExpression Id. */
+  int GT = 26;
+  /** RegularExpression Id. */
+  int EQ = 27;
+  /** RegularExpression Id. */
+  int ACHAVES = 28;
+  /** RegularExpression Id. */
+  int FCHAVES = 29;
+  /** RegularExpression Id. */
+  int APAREN = 30;
+  /** RegularExpression Id. */
+  int FPAREN = 31;
+  /** RegularExpression Id. */
+  int VIRGULA = 32;
+  /** RegularExpression Id. */
+  int PONTOVIRGULA = 33;
+  /** RegularExpression Id. */
+  int ATRIBUICAO = 34;
+  /** RegularExpression Id. */
+  int NUM = 35;
+  /** RegularExpression Id. */
+  int ID = 36;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -45,9 +87,30 @@ public interface LugosiConstants {
     "\"main\"",
     "\"let\"",
     "\"float\"",
+    "\"bool\"",
+    "\"true\"",
+    "\"false\"",
+    "\"return\"",
     "\"printIO\"",
+    "\"readIO\"",
+    "\"if\"",
+    "\"while\"",
+    "\"do\"",
+    "\"def\"",
+    "\"+\"",
+    "\"-\"",
+    "\"*\"",
+    "\"/\"",
+    "\"&&\"",
+    "\"||\"",
+    "\"<\"",
+    "\">\"",
+    "\"==\"",
     "\"{\"",
     "\"}\"",
+    "\"(\"",
+    "\")\"",
+    "\",\"",
     "\";\"",
     "\":=\"",
     "<NUM>",
