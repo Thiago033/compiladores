@@ -1,33 +1,27 @@
 PARSER_BEGIN(Lugosi)
-
 import java.io.*;
 public class Lugosi {
+
   public static void main(String args[]) throws ParseException, IOException {
     Lugosi analisador = new Lugosi(new FileInputStream(args[0]));
-    try {
-      analisador.Programa();
-      System.out.println("Programa analisado com sucesso.");
-    } catch (ParseException e) {
-      System.out.println("Erro de parsing: " + e.getMessage());
-    }
+    analisador.Lugosi();
   }
-}
 
+}
 PARSER_END(Lugosi)
 
-// Ignorar espaços, tabulações e quebras de linha
 SKIP :
 {
   " " | "\t" | "\n" | "\r"
 }
 
-// ----------------- Definição de Tokens -----------------
 TOKEN :
 {
   // Palavras reservadas
   <VOID: "void"> |
   <MAIN: "main"> |
   <LET: "let"> |
+  <INT: "int"> |
   <FLOAT: "float"> |
   <BOOL: "bool"> |
   <TRUE: "true"> |
@@ -63,90 +57,181 @@ TOKEN :
   // Literais
   <NUM: (["0"-"9"])+("."(["0"-"9"])+)? > | // Número inteiro ou decimal
   <ID: ["a"-"z", "A"-"Z"] (["a"-"z", "A"-"Z", "0"-"9"])* > // Identificadores
+
 }
 
-// ------------------ Regras da Linguagem ------------------
-
-// PROGRAMA -> "void" "main" "{" COMANDOS "}"
-void Programa() :
+void Lugosi() : 
 {}
 {
-  <VOID> <MAIN> <ACHAVES> Comandos() <FCHAVES> <EOF>
+
+Main() (Funcao())?
+<EOF>
+
 }
 
-// COMANDOS -> COM ";" COMANDOS'
-void Comandos() :
+
+void Main () :
 {}
 {
-  Com() <PONTOVIRGULA> ComandosL()
+<VOID> <MAIN> <ACHAVES> VarDecl() SeqComandos() <FCHAVES>
 }
 
-// COMANDOS' -> COM ";" COMANDOS' | ε
-void ComandosL() :
+
+void VarDecl () :
+{ }
+{
+    (<LET> Tipo() <ID> <PONTOVIRGULA>)*
+}
+
+
+void Tipo () :
 {}
 {
-  (Com() <PONTOVIRGULA> ComandosL())?
+<FLOAT> | <BOOL> | <VOID> | <INT>
 }
 
-// COM -> DECLARACAO | ATRIBUICAO | PRINT
-void Com() :
+
+void SeqComandos() :
 {}
 {
-  Declaracao() | Atribuicao() | Print()
+(Comando())*
 }
 
-// DECLARACAO -> "let" ("float" | "bool") ID
-void Declaracao() :
+void Comando() :
+{ }
+{
+    (<ID> | <NUM>) ComandoTokenID() |
+    <IF> Expressao() <ACHAVES> SeqComandos() <FCHAVES> <PONTOVIRGULA> |
+    <WHILE> Expressao() <DO> <ACHAVES> SeqComandos() <FCHAVES> <PONTOVIRGULA> |
+    <RETURN> Expressao() <PONTOVIRGULA> |
+    <PRINTIO> Expressao() <PONTOVIRGULA>
+}
+
+
+
+void ComandoTokenID() :
 {}
 {
-  <LET> ( <FLOAT> | <BOOL> ) <ID>
+  <ATRIBUICAO> ComandoTokenIDAttrib() |
+  <APAREN> (ListaExpressao())? <FPAREN> <PONTOVIRGULA>
 }
 
-// ATRIBUICAO -> ID ":=" EXP
-void Atribuicao() :
+void ComandoTokenIDAttrib() :
 {}
 {
-  <ID> <ATRIBUICAO> Exp()
+  Expressao() <PONTOVIRGULA> |
+  <READIO> <APAREN> <FPAREN> <PONTOVIRGULA>
 }
 
-// PRINT -> "printIO" "(" EXP ")" | "printIO" ID
-void Print() :
-{}
+
+void Expressao() :
+{ }
 {
-  <PRINTIO> ( <APAREN> Exp() <FPAREN> | <ID> )
+    Termo() (OP() Termo())*
 }
 
-// EXPRESSÃO -> TERMO EXP'
-void Exp() :
-{}
-{
-  Termo() ExpL()
-}
-
-// EXP' -> ("+" | "-") TERMO EXP' | ε
-void ExpL() :
-{}
-{
-  ( ( <PLUS> | <MINUS> ) Termo() ExpL() )?
-}
-
-// TERMO -> FATOR TERMO'
 void Termo() :
-{}
+{ }
 {
-  Fator() TermoL()
+    <APAREN> Expressao() <FPAREN> | Fator()
 }
 
-// TERMO' -> ("*" | "/") FATOR TERMO' | ε
-void TermoL() :
-{}
-{
-  ( ( <MULT> | <DIV> ) Fator() TermoL() )?
-}
 
-// FATOR -> NUM | ID | "(" EXP ")"
+
 void Fator() :
 {}
 {
-  <NUM> | <ID> | ( <APAREN> Exp() <FPAREN> )
+<NUM> Fator_() | <ID> | <TRUE> | <FALSE>
+}
+
+void Fator_() :
+{}
+{
+(<APAREN> (ListaExpressao())? <FPAREN>)?
+}
+
+
+void OP() :
+{}
+{
+<PLUS> | <MINUS> | <MULT> | <DIV> | <AND> | <OR> | <LT> | <GT> | <EQ>
+}
+
+
+void ListaExpressao() :
+{}
+{
+Expressao() (<VIRGULA> Expressao())*
+}
+
+void Funcao() :
+{ }
+{
+    (<DEF> Tipo() <ID> <APAREN> (ListaArg())? <FPAREN> <ACHAVES> VarDecl() SeqComandos() <FCHAVES>)+
+}
+
+void ListaArg() :
+{ }
+{
+    Tipo() <ID> (<VIRGULA> Tipo() <ID>)*
+}
+
+
+
+void Atribuicao() :
+{}
+{
+
+  <ATRIBUICAO> Expressao() <PONTOVIRGULA>
+
+}
+
+
+void If() :
+{}
+{
+  
+  <IF> <APAREN> Expressao() <FPAREN> <ACHAVES> SeqComandos() <FCHAVES> <PONTOVIRGULA>
+  
+}
+
+void While() :
+{}
+{
+  
+  <WHILE> <APAREN> Expressao() <FPAREN> <DO> <ACHAVES> SeqComandos() <FCHAVES> <PONTOVIRGULA>
+  
+}
+
+void Do() :
+{}
+{
+  
+  <DO> <ACHAVES> SeqComandos() <FCHAVES> <WHILE> <APAREN> Expressao() <FPAREN> <PONTOVIRGULA>
+  
+}
+
+void Return() :
+{}
+{
+  
+  <RETURN> Expressao() <PONTOVIRGULA>
+  
+}
+
+void Print() :
+{}
+{
+  
+  <PRINTIO> <APAREN> Expressao() <FPAREN> <PONTOVIRGULA>
+  
+} 
+
+
+void ChamadaFuncao() :
+{}
+{
+
+  <APAREN> (ListaExpressao())? <FPAREN> <PONTOVIRGULA>
+
 }
