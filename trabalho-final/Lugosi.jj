@@ -1,0 +1,259 @@
+PARSER_BEGIN(Lugosi)
+
+import java.io.*;
+// importar as classes da árvore sintática:
+import ast.*;
+
+public class Lugosi {
+
+    public static void main(String args[]) throws Exception {
+        // abrir o arquivo passado por linha
+        // de comando contento o código em Lugosi:
+        FileInputStream fs = new FileInputStream(new File(args[0]));
+
+        // Instanciar o parser da linguagem Lugosi passando
+        // como argumento o arquivo contendo o código
+        //Lugosi a ser processado:
+
+        Lugosi parser = new Lugosi(fs);
+
+        // Chamar a primeira regra do parser que irá
+        // analisar o código e devolver a árvore sintática
+
+        Prog arvore = parser.Lugosi();
+
+        // passar a árvore para o gerador de código
+        // que deve gerar um arquivo com com o código
+        // alvo na linguagem escolhida:
+
+        geraCodigo(arvore, args[0])
+    }
+
+    public static void geraCodigo(ArvoreLugosi prog, String arquivo) { ? ? ? ? ? ?
+    }
+}
+PARSER_END(Lugosi)
+
+SKIP :
+{
+  " " | "\t" | "\n" | "\r"
+}
+
+TOKEN :
+{
+  // Palavras reservadas
+  <VOID: "void"> |
+  <MAIN: "main"> |
+  <LET: "let"> |
+  <INT: "int"> |
+  <FLOAT: "float"> |
+  <BOOL: "bool"> |
+  <TRUE: "true"> |
+  <FALSE: "false"> |
+  <RETURN: "return"> |
+  <PRINTIO: "printIO"> |
+  <READIO: "readIO"> |
+  <IF: "if"> |
+  <WHILE: "while"> |
+  <DO: "do"> |
+  <DEF: "def"> |
+
+  // Operadores
+  <PLUS: "+"> |
+  <MINUS: "-"> |
+  <MULT: "*"> |
+  <DIV: "/"> |
+  <AND: "&&"> |
+  <OR: "||"> |
+  <LT: "<"> |
+  <GT: ">"> |
+  <EQ: "=="> |
+
+  // Símbolos
+  <ACHAVES: "{"> |
+  <FCHAVES: "}"> |
+  <APAREN: "("> |
+  <FPAREN: ")"> |
+  <VIRGULA: ","> |
+  <PONTOVIRGULA: ";"> |
+  <ATRIBUICAO: ":="> |
+
+  // Literais
+  <NUM: (["0"-"9"])+("."(["0"-"9"])+)? > | // Número inteiro ou decimal
+  <ID: ["a"-"z", "A"-"Z"] (["a"-"z", "A"-"Z", "0"-"9"])* > // Identificadores
+
+}
+
+Prog Lugosi():
+{ Main main=null; ArrayList<Fun> funs = null;}
+{
+    <MAIN> <ACHAVES> main=Main() funs=Fun()<FCHAVES> 
+    
+    { return Prog(main, funs) }
+}
+
+void Main () :
+{}
+{
+<VOID> <MAIN> <ACHAVES> VarDecl() SeqComandos() <FCHAVES>
+}
+
+
+void VarDecl () :
+{ }
+{
+    (<LET> Tipo() <ID> <PONTOVIRGULA>)*
+}
+
+
+void Tipo () :
+{}
+{
+<FLOAT> | <BOOL> | <VOID> | <INT>
+}
+
+
+void SeqComandos() :
+{}
+{
+(Comando())*
+}
+
+void Comando() :
+{ }
+{
+    (<ID> | <NUM>) ComandoTokenID() |
+    <IF> Expressao() <ACHAVES> SeqComandos() <FCHAVES> <PONTOVIRGULA> |
+    <WHILE> Expressao() <DO> <ACHAVES> SeqComandos() <FCHAVES> <PONTOVIRGULA> |
+    <RETURN> Expressao() <PONTOVIRGULA> |
+    <PRINTIO> Expressao() <PONTOVIRGULA>
+}
+
+
+
+void ComandoTokenID() :
+{}
+{
+  <ATRIBUICAO> ComandoTokenIDAttrib() |
+  <APAREN> (ListaExpressao())? <FPAREN> <PONTOVIRGULA>
+}
+
+void ComandoTokenIDAttrib() :
+{}
+{
+  Expressao() <PONTOVIRGULA> |
+  <READIO> <APAREN> <FPAREN> <PONTOVIRGULA>
+}
+
+
+void Expressao() :
+{ }
+{
+    Termo() (OP() Termo())*
+}
+
+void Termo() :
+{ }
+{
+    <APAREN> Expressao() <FPAREN> | Fator()
+}
+
+
+
+void Fator() :
+{}
+{
+<NUM> Fator_() | <ID> | <TRUE> | <FALSE>
+}
+
+void Fator_() :
+{}
+{
+(<APAREN> (ListaExpressao())? <FPAREN>)?
+}
+
+
+void OP() :
+{}
+{
+<PLUS> | <MINUS> | <MULT> | <DIV> | <AND> | <OR> | <LT> | <GT> | <EQ>
+}
+
+
+void ListaExpressao() :
+{}
+{
+Expressao() (<VIRGULA> Expressao())*
+}
+
+void Funcao() :
+{ }
+{
+    (<DEF> Tipo() <ID> <APAREN> (ListaArg())? <FPAREN> <ACHAVES> VarDecl() SeqComandos() <FCHAVES>)+
+}
+
+void ListaArg() :
+{ }
+{
+    Tipo() <ID> (<VIRGULA> Tipo() <ID>)*
+}
+
+
+
+void Atribuicao() :
+{}
+{
+
+  <ATRIBUICAO> Expressao() <PONTOVIRGULA>
+
+}
+
+
+void If() :
+{}
+{
+  
+  <IF> <APAREN> Expressao() <FPAREN> <ACHAVES> SeqComandos() <FCHAVES> <PONTOVIRGULA>
+  
+}
+
+void While() :
+{}
+{
+  
+  <WHILE> <APAREN> Expressao() <FPAREN> <DO> <ACHAVES> SeqComandos() <FCHAVES> <PONTOVIRGULA>
+  
+}
+
+void Do() :
+{}
+{
+  
+  <DO> <ACHAVES> SeqComandos() <FCHAVES> <WHILE> <APAREN> Expressao() <FPAREN> <PONTOVIRGULA>
+  
+}
+
+void Return() :
+{}
+{
+  
+  <RETURN> Expressao() <PONTOVIRGULA>
+  
+}
+
+void Print() :
+{}
+{
+  
+  <PRINTIO> <APAREN> Expressao() <FPAREN> <PONTOVIRGULA>
+  
+} 
+
+
+void ChamadaFuncao() :
+{}
+{
+
+  <APAREN> (ListaExpressao())? <FPAREN> <PONTOVIRGULA>
+
+}
