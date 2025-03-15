@@ -46,51 +46,29 @@ SKIP :
 | "\r"
 }
 
-TOKEN :
-{
-  // Palavras reservadas
-  <VOID: "void"> |
-  <MAIN: "main"> |
-  <LET: "let"> |
-  <INT: "int"> |
-  <FLOAT: "float"> |
-  <BOOL: "bool"> |
-  <TRUE: "true"> |
-  <FALSE: "false"> |
-  <RETURN: "return"> |
-  <PRINTIO: "printIO"> |
-  <READIO: "readIO"> |
-  <IF: "if"> |
-  <WHILE: "while"> |
-  <DO: "do"> |
-  <DEF: "def"> |
-
-  // Operadores
-  <PLUS: "+"> |
-  <MINUS: "-"> |
-  <MULT: "*"> |
-  <DIV: "/"> |
-  <AND: "&&"> |
-  <OR: "||"> |
-  <LT: "<"> |
-  <GT: ">"> |
-  <EQ: "=="> |
-  <LEQ: "<="> |
-  <GEQ: ">="> |
-
-  // Símbolos
-  <ACHAVES: "{"> |
-  <FCHAVES: "}"> |
-  <APAREN: "("> |
-  <FPAREN: ")"> |
-  <VIRGULA: ","> |
-  <PONTOVIRGULA: ";"> |
-  <ATRIBUICAO: ":="> |
-
-  // Literais
-  <NUM: (["0"-"9"])+("."(["0"-"9"])+)? > |
-  <ID: ["a"-"z", "A"-"Z"] (["a"-"z", "A"-"Z", "0"-"9"])* >
-}
+TOKEN : {
+    // Palavras reservadas
+    <VOID: "void">        | <MAIN: "main">      | <LET: "let">         |
+    <INT: "int">          | <FLOAT: "float">    | <BOOL: "bool">       |
+    <TRUE: "true">        | <FALSE: "false">    | <RETURN: "return">   |
+    <PRINTIO: "printIO">  | <READIO: "readIO">  | <IF: "if">           |
+    <WHILE: "while">      | <DO: "do">          | <DEF: "def">         |
+  
+    // Operadores
+    <PLUS: "+">           | <MINUS: "-">        | <MULT: "*">          |
+    <DIV: "/">            | <AND: "&&">         | <OR: "||">           |
+    <LT: "<">             | <GT: ">">          | <EQ: "==">           |
+    <LEQ: "<=">           | <GEQ: ">=">         |
+  
+    // Símbolos
+    <ACHAVES: "{">        | <FCHAVES: "}">      | <APAREN: "(">        |
+    <FPAREN: ")">         | <VIRGULA: ",">      | <PONTOVIRGULA: ";">  |
+    <ATRIBUICAO: ":=">    |
+  
+    // Literais
+    <NUM: (["0"-"9"])+ ("." (["0"-"9"])+)? >    |
+    <ID: ["a"-"z", "A"-"Z"] (["a"-"z", "A"-"Z", "0"-"9"])* >
+  }
 
 Prog Lugosi() :
 {Main main; ArrayList<Fun> fun = new ArrayList<Fun>();}
@@ -115,11 +93,10 @@ Main Main() :
 
 
 ArrayList<VarDecl> VarDecl() :
-{ArrayList<VarDecl> vars = new ArrayList<VarDecl>(); String type; String var; ArrayList<VarDecl> moreVars;}
+{ ArrayList<VarDecl> vars = new ArrayList<VarDecl>(); String type; String var; }
 {
-    (<LET> type = Tipo() var = <ID>.image <PONTOVIRGULA> {vars.add(new VarDecl(type, var)); moreVars = VarDecl(); vars.addAll(moreVars);})?
-
-    {return vars;}
+    (<LET> type = Tipo() var = <ID>.image <PONTOVIRGULA> { vars.add(new VarDecl(type, var)); })*
+    { return vars; }
 }
 
 
@@ -142,13 +119,16 @@ ArrayList<Comando> SeqComandos() :
 
 
 Exp Fator() :
-{Token token; ArrayList<Exp> args; String fun;}
+{ Token token; ArrayList<Exp> args; }
 {
-    LOOKAHEAD(2) token = <ID> <APAREN> args = ListaExpressao() <FPAREN> {return new EChamadaFun(token.image, args);}
-    | token = <ID> {return new EVar(token.image);}
-    | token = <NUM> {return new EFloat(Float.parseFloat(token.image));}
-    | <TRUE> {return new ETrue();}
-    | <FALSE> {return new EFalse();}
+    token = <ID> 
+    (
+        <APAREN> args = ListaExpressao() <FPAREN> { return new EChamadaFun(token.image, args); }
+        | { return new EVar(token.image); }
+    )
+    | token = <NUM> { return new EFloat(Float.parseFloat(token.image)); }
+    | <TRUE> { return new ETrue(); }
+    | <FALSE> { return new EFalse(); }
 }
 
 String OP():
