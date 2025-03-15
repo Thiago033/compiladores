@@ -1,33 +1,49 @@
+options {
+    OUTPUT_DIRECTORY = "libs";
+}
+
 PARSER_BEGIN(Lugosi)
 
-import java.io.*;
-import java.util.ArrayList;
+package libs;
+
 import ast.*;
+import java.io.*;
+import java.util.*;
 
 public class Lugosi {
+  public static void main(String args[]) throws Exception{
+  // abrir o arquivo passado por linha
+  // de comando contento o código em Lugosi:
 
-    public static void main(String args[]) throws Exception {
-        try {
-            FileInputStream fs = new FileInputStream(new File(args[0]));
-            Lugosi parser = new Lugosi(fs);
-            Prog arvore = parser.Lugosi();
-            System.out.println("Parsing completed successfully!");
-            geraCodigo(arvore, args[0]);
-        } catch (ParseException e) {
-            System.out.println("Parsing error: " + e.getMessage());
-        }
-    }
+  FileInputStream fs = new FileInputStream(new File(args[0]));
 
-    public static void geraCodigo(Prog prog, String arquivo) {
-        System.out.println("AST: " + prog);
-    }
+  // Instanciar o parser da linguagem Lugosi passando
+  // como argumento o arquivo contendo o código
+  //Lugosi a ser processado:
+
+  Lugosi parser = new Lugosi(fs);
+
+  // Chamar a primeira regra do parser que irá
+  // analisar o código e devolver a árvore sintática
+
+  Prog arvore = parser.Lugosi();
+
+  // passar a árvore para o gerador de código
+  // que deve gerar um arquivo com com o código
+  // alvo na linguagem escolhida:
+  
+  geraCodigo(arvore, args[0])
+  }
 }
 
 PARSER_END(Lugosi)
 
 SKIP :
 {
-  " " | "\t" | "\n" | "\r"
+  " "
+| "\t"
+| "\n"
+| "\r"
 }
 
 TOKEN :
@@ -59,6 +75,8 @@ TOKEN :
   <LT: "<"> |
   <GT: ">"> |
   <EQ: "=="> |
+  <LEQ: "<="> |
+  <GEQ: ">="> |
 
   // Símbolos
   <ACHAVES: "{"> |
@@ -74,120 +92,127 @@ TOKEN :
   <ID: ["a"-"z", "A"-"Z"] (["a"-"z", "A"-"Z", "0"-"9"])* >
 }
 
-Prog Lugosi():
-{ Main main; ArrayList<Fun> funs = new ArrayList<Fun>(); Fun fun; }
+Prog Lugosi() :
+{Main main; ArrayList<Fun> fun = new ArrayList<Fun>();}
 {
-    main=Main() (fun=Funcao() { funs.add(fun); })*
-    { return new Prog(main, funs); }
+    main = Main() 
+    fun = Fun()
+
+    {return new Prog(main, fun);}
 }
 
-Main Main():
-{ 
-    ArrayList<VarDecl> vars = new ArrayList<VarDecl>(); 
-    ArrayList<Comando> coms = new ArrayList<Comando>(); 
-}
+
+Main Main() :
+{ArrayList<VarDecl> vars = new ArrayList<VarDecl>(); ArrayList<Comando> coms = new ArrayList<Comando>();}
 {
-    <VOID> <MAIN> <ACHAVES> vars=VarDecl() coms=SeqComandos() <FCHAVES>
-    { return new Main(vars, coms); }
+    <VOID> <MAIN> <ACHAVES>
+    vars = VarDecl() 
+    coms = SeqComandos()    
+    <FCHAVES>
+
+    {return new Main(vars, coms);}
 }
 
-ArrayList<VarDecl> VarDecl():
-{ ArrayList<VarDecl> vars = new ArrayList<VarDecl>(); String tipo; Token id; }
+
+ArrayList<VarDecl> VarDecl() :
+{ArrayList<VarDecl> vars = new ArrayList<VarDecl>(); String type; String var; ArrayList<VarDecl> moreVars;}
 {
-    ( <LET> tipo=Tipo() id=<ID> <PONTOVIRGULA> { vars.add(new VarDecl(tipo, id.image)); } )*
-    { return vars; }
+    (<LET> type = Tipo() var = <ID>.image <PONTOVIRGULA> {vars.add(new VarDecl(type, var)); moreVars = VarDecl(); vars.addAll(moreVars);})?
+
+    {return vars;}
 }
 
-String Tipo():
-{}
+
+String Tipo() :
+{Token token;}
 {
-    <FLOAT> { return "float"; } |
-    <BOOL> { return "bool"; } |
-    <VOID> { return "void"; } |
-    <INT> { return "int"; }
+    token = <FLOAT> {return token.image;}
+    | token = <BOOL> {return token.image;}
+    | token = <VOID> {return token.image;}
+    | token = <INT> {return token.image;}
 }
 
-ArrayList<Comando> SeqComandos():
-{ ArrayList<Comando> comandos = new ArrayList<Comando>(); Comando cmd; }
+ArrayList<Comando> SeqComandos() :
+{ArrayList<Comando> coms = new ArrayList<Comando>(); Comando com; ArrayList<Comando> moreComs;}
 {
-    (cmd=Comando() { comandos.add(cmd); })*
-    { return comandos; }
+    (com = Comando() {coms.add(com); moreComs = SeqComandos(); coms.addAll(moreComs);})?
+
+    {return coms;}
 }
 
-Comando Comando():
-{ Exp exp; Token id; ArrayList<Comando> bloco = new ArrayList<Comando>(); }
-{
-    (id=<ID> exp=ComandoTokenID() { return new CAtribuicao(id.beginLine, id.image, exp); }) |
-    (<IF> exp=Expressao() <ACHAVES> bloco=SeqComandos() <FCHAVES> <PONTOVIRGULA> { return new CIf(getToken(1).beginLine, exp, bloco); }) |
-    (<WHILE> exp=Expressao() <DO> <ACHAVES> bloco=SeqComandos() <FCHAVES> <PONTOVIRGULA> { return new CWhile(getToken(1).beginLine, exp, bloco); }) |
-    (<RETURN> exp=Expressao() <PONTOVIRGULA> { return new CReturn(getToken(1).beginLine, exp); }) |
-    (<PRINTIO> exp=Expressao() <PONTOVIRGULA> { return new CPrint(getToken(1).beginLine, exp); })
-}
 
-Exp ComandoTokenID():
-{ Exp exp = null; ArrayList<Exp> args = new ArrayList<Exp>(); }
+Exp Fator() :
+{Token token; ArrayList<Exp> args; String fun;}
 {
-    <ATRIBUICAO> exp=Expressao() <PONTOVIRGULA> { return exp; } |
-    <APAREN> (args=ListaExpressao())? <FPAREN> <PONTOVIRGULA> { return null; }
-}
-
-Exp Expressao():
-{ Exp arg1, arg2; String op; }
-{
-    arg1=Termo() (op=OP() arg2=Termo() { return new EOpExp(op, arg1, arg2); })*
-    { return arg1; }
+    LOOKAHEAD(2) token = <ID> <APAREN> args = ListaExpressao() <FPAREN> {return new EChamadaFun(token.image, args);}
+    | token = <ID> {return new EVar(token.image);}
+    | token = <NUM> {return new EFloat(Float.parseFloat(token.image));}
+    | <TRUE> {return new ETrue();}
+    | <FALSE> {return new EFalse();}
 }
 
 String OP():
 { Token token; }
 {
-    ( token=<PLUS> | token=<MINUS> | token=<MULT> | token=<DIV> | 
-      token=<AND> | token=<OR> | token=<LT> | token=<GT> | token=<EQ> )
+    ( token=<PLUS> 
+    | token=<MINUS> 
+    | token=<MULT> 
+    | token=<DIV> 
+    | token=<AND> 
+    | token=<OR> 
+    | token=<LT> 
+    | token=<GT> 
+    | token=<EQ> 
+    | token=<LEQ>
+    | token=<GEQ>)
+
     { return token.image; }
 }
 
-Exp Termo():
-{ Exp exp; }
+ArrayList<Exp> ListaExpressao() :
+{ArrayList<Exp> exps = new ArrayList<Exp>(); Exp e;}
 {
-    <APAREN> exp=Expressao() <FPAREN> { return exp; } |
-    exp=Fator() { return exp; }
+    e = EXP() {exps.add(e);} (<VIRGULA> e = EXP() {exps.add(e);})*
+    
+    {return exps;}
 }
 
-Exp Fator():
-{ Token num; Token id; }
+
+
+ArrayList<Fun> Fun() :
+{ArrayList<Fun> fun = new ArrayList<Fun>(); String nome; ArrayList<ParamFormalFun> params;String retorno; ArrayList<VarDecl> vars;ArrayList<Comando> body;}
 {
-    num=<NUM> { return new EFloat(Float.parseFloat(num.image)); } |
-    id=<ID> { return new EVar(id.image); } |
-    <TRUE> { return new ETrue(); } |
-    <FALSE> { return new EFalse(); }
+    (<DEF> retorno = Tipo() nome = <ID>.image "(" params = ListaArg() ")" "{" vars = VarDecl() body = SeqComandos() "}" {fun.add(new Fun(nome, params, retorno, vars, body));})*
+    
+    {return fun;}
 }
 
-ArrayList<Exp> ListaExpressao():
-{ ArrayList<Exp> exps = new ArrayList<Exp>(); Exp exp; }
+
+ArrayList<ParamFormalFun> ListaArg() :
+{ArrayList<ParamFormalFun> params = new ArrayList<ParamFormalFun>(); String type; String var;}
 {
-    exp=Expressao() { exps.add(exp); }
-    (<VIRGULA> exp=Expressao() { exps.add(exp); })*
-    { return exps; }
+    type = Tipo() var = <ID>.image {params.add(new ParamFormalFun(type, var));} ("," type = Tipo() var = <ID>.image {params.add(new ParamFormalFun(type, var));})*
+    
+    {return params;}
 }
 
-Fun Funcao():
+
+
+Exp EXP() :
+{Exp arg1; String op; Exp arg2; Exp fator;}
 {
-    Token id;
-    String tipo;
-    ArrayList<ParamFormalFun> params = new ArrayList<ParamFormalFun>();
-    ArrayList<VarDecl> vars = new ArrayList<VarDecl>();
-    ArrayList<Comando> body = new ArrayList<Comando>();
-}
-{
-    <DEF> tipo=Tipo() id=<ID> <APAREN> (params=ListaArg())? <FPAREN> 
-    <ACHAVES> vars=VarDecl() body=SeqComandos() <FCHAVES> 
-    { return new Fun(id.image, params, tipo, vars, body); }
+    "(" arg1 = EXP() op = OP() arg2 = EXP() ")" {return new EOpExp(op, arg1, arg2);}
+    | fator = Fator() {return fator;}
 }
 
-ArrayList<ParamFormalFun> ListaArg():
-{ ArrayList<ParamFormalFun> args = new ArrayList<ParamFormalFun>(); String tipo; Token id; }
+Comando Comando() :
+{Token token; Exp exp; ArrayList<Comando> coms = new ArrayList<Comando>(); ArrayList<Exp> args;}
 {
-    tipo=Tipo() id=<ID> { args.add(new ParamFormalFun(tipo, id.image)); }
-    (<VIRGULA> tipo=Tipo() id=<ID> { args.add(new ParamFormalFun(tipo, id.image)); })*
-    { return args; }
+    LOOKAHEAD(3) token = <ID> <ATRIBUICAO> exp = EXP() <PONTOVIRGULA> {return new CAtribuicao(token.beginLine, token.image, exp);}
+    | LOOKAHEAD(2) token = <ID> <APAREN> args = ListaExpressao() <FPAREN> <PONTOVIRGULA> {return new CChamadaFun(token.beginLine, token.image, args);}
+    | token = <IF> exp = EXP() <ACHAVES> coms = SeqComandos() <FCHAVES> <PONTOVIRGULA> {return new CIf(token.beginLine, exp, coms);}
+    | token = <WHILE> exp = EXP() <DO> <ACHAVES> coms = SeqComandos() <FCHAVES> <PONTOVIRGULA> {return new CWhile(token.beginLine, exp, coms);}
+    | LOOKAHEAD(3) token = <ID> <ATRIBUICAO> <READIO> <APAREN> <FPAREN> {return new CReadInput(token.beginLine, token.image);}
+    | token = <RETURN> exp = EXP() <PONTOVIRGULA> {return new CReturn(token.beginLine, exp);}
+    | token = <PRINTIO> exp = EXP() <PONTOVIRGULA> {return new CPrint(token.beginLine, exp);}
 }

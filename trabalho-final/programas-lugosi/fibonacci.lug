@@ -1,0 +1,42 @@
+void main {
+    let int sum;
+    let int i;
+    
+    sum := 0;
+    i := 1;
+
+    while (i <= 5) do {
+        sum := (sum + fibonacci(i));
+        i := (i + 1);
+    };
+
+    printIO sum;
+}
+
+def int fibonacci(int n) {
+    let int a;
+    let int b;
+    let int temp;
+    let int count;
+
+    if (n == 0) {
+        return 0;
+    };
+
+    if (n == 1) {
+        return 1;
+    };
+
+    a := 0;
+    b := 1;
+    count := 2;
+
+    while (count <= n) do {
+        temp := (a + b);
+        a := b;
+        b := temp;
+        count := (count + 1);
+    };
+
+    return b;
+}
