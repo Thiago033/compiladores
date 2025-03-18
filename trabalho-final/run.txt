@@ -1,6 +1,6 @@
 javacc Lugosi.jj
 
-javac ast\*.java libs/*.java
+javac ast\*.java libs\*.java
 
 java -cp . libs.Lugosi programas-lugosi/factorial.lug
 
