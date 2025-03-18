@@ -6,86 +6,88 @@ import java.io.*;
 import java.util.*;
 
 public class Lugosi implements LugosiConstants {
-  public static void main(String args[]) throws Exception{
-  // abrir o arquivo passado por linha
-  // de comando contento o código em Lugosi:
+    public static void main(String args[]) throws Exception {
+        // abrir o arquivo passado por linha
+        // de comando contento o código em Lugosi:
 
-  FileInputStream fs = new FileInputStream(new File(args[0]));
+        FileInputStream fs = new FileInputStream(new File(args[0]));
 
-  // Instanciar o parser da linguagem Lugosi passando
-  // como argumento o arquivo contendo o código
-  //Lugosi a ser processado:
+        // Instanciar o parser da linguagem Lugosi passando
+        // como argumento o arquivo contendo o código
+        //Lugosi a ser processado:
 
-  Lugosi parser = new Lugosi(fs);
+        Lugosi parser = new Lugosi(fs);
 
-  // Chamar a primeira regra do parser que irá
-  // analisar o código e devolver a árvore sintática
+        // Chamar a primeira regra do parser que irá
+        // analisar o código e devolver a árvore sintática
 
-  Prog arvore = parser.Lugosi();
+        Prog arvore = parser.Lugosi();
 
-  // passar a árvore para o gerador de código
-  // que deve gerar um arquivo com com o código
-  // alvo na linguagem escolhida:
+        // passar a árvore para o gerador de código
+        // que deve gerar um arquivo com com o código
+        // alvo na linguagem escolhida:
 
-  GeraCodigo.gerar(arvore);
-  }
+        GeraCodigo.gerar(arvore);
+    }
 
   static final public Prog Lugosi() throws ParseException {
- Main main; ArrayList<Fun> fun = new ArrayList<Fun>();
+    Main main;ArrayList < Fun > fun = new ArrayList < Fun > ();
     main = Main();
     fun = Fun();
-     {if (true) return new Prog(main, fun);}
+        {if (true) return new Prog(main, fun);}
     throw new Error("Missing return statement in function");
   }
 
   static final public Main Main() throws ParseException {
- ArrayList<VarDecl> vars = new ArrayList<VarDecl>(); ArrayList<Comando> coms = new ArrayList<Comando>();
+    ArrayList < VarDecl > vars = new ArrayList < VarDecl > ();ArrayList < Comando > coms = new ArrayList < Comando > ();
     jj_consume_token(VOID);
     jj_consume_token(MAIN);
     jj_consume_token(ACHAVES);
     vars = VarDecl();
     coms = SeqComandos();
     jj_consume_token(FCHAVES);
-     {if (true) return new Main(vars, coms);}
+            {if (true) return new Main(vars, coms);}
     throw new Error("Missing return statement in function");
   }
 
-  static final public ArrayList<VarDecl> VarDecl() throws ParseException {
- ArrayList<VarDecl> vars = new ArrayList<VarDecl>(); String type; String var; ArrayList<VarDecl> moreVars;
+  static final public ArrayList < VarDecl > VarDecl() throws ParseException {
+    ArrayList < VarDecl > vars = new ArrayList < VarDecl > ();String type;String
+    var;ArrayList < VarDecl > moreVars;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case LET:
       jj_consume_token(LET);
       type = Tipo();
       var = jj_consume_token(ID).image;
       jj_consume_token(PONTOVIRGULA);
-                                                          vars.add(new VarDecl(type, var)); moreVars = VarDecl(); vars.addAll(moreVars);
+        vars.add(new VarDecl(type,
+            var));moreVars = VarDecl();vars.addAll(moreVars);
       break;
     default:
       jj_la1[0] = jj_gen;
       ;
     }
-     {if (true) return vars;}
+        {if (true) return vars;}
     throw new Error("Missing return statement in function");
   }
 
   static final public String Tipo() throws ParseException {
- Token token;
+    Token token;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case FLOAT:
       token = jj_consume_token(FLOAT);
-                     {if (true) return token.image;}
+        {if (true) return token.image;}
       break;
     case BOOL:
       token = jj_consume_token(BOOL);
-                      {if (true) return token.image;}
+        {if (true) return token.image;}
       break;
     case VOID:
       token = jj_consume_token(VOID);
-                      {if (true) return token.image;}
+        {if (true) return token.image;}
       break;
     case INT:
       token = jj_consume_token(INT);
-                     {if (true) return token.image;}
+        {if (true) return token.image;}
       break;
     default:
       jj_la1[1] = jj_gen;
@@ -95,8 +97,8 @@ public class Lugosi implements LugosiConstants {
     throw new Error("Missing return statement in function");
   }
 
-  static final public ArrayList<Comando> SeqComandos() throws ParseException {
- ArrayList<Comando> coms = new ArrayList<Comando>(); Comando com; ArrayList<Comando> moreComs;
+  static final public ArrayList < Comando > SeqComandos() throws ParseException {
+    ArrayList < Comando > coms = new ArrayList < Comando > ();Comando com;ArrayList < Comando > moreComs;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case RETURN:
     case PRINTIO:
@@ -104,41 +106,43 @@ public class Lugosi implements LugosiConstants {
     case WHILE:
     case ID:
       com = Comando();
-                      coms.add(com); moreComs = SeqComandos(); coms.addAll(moreComs);
+        coms.add(com);
+        moreComs = SeqComandos();
+        coms.addAll(moreComs);
       break;
     default:
       jj_la1[2] = jj_gen;
       ;
     }
-     {if (true) return coms;}
+        {if (true) return coms;}
     throw new Error("Missing return statement in function");
   }
 
   static final public Exp Fator() throws ParseException {
- Token token; ArrayList<Exp> args; String fun;
+    Token token;ArrayList < Exp > args;String fun;
     if (jj_2_1(2)) {
       token = jj_consume_token(ID);
       jj_consume_token(APAREN);
       args = ListaExpressao();
       jj_consume_token(FPAREN);
-                                                                         {if (true) return new EChamadaFun(token.image, args);}
+        {if (true) return new EChamadaFun(token.image, args);}
     } else {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case ID:
         token = jj_consume_token(ID);
-                    {if (true) return new EVar(token.image);}
+        {if (true) return new EVar(token.image);}
         break;
       case NUM:
         token = jj_consume_token(NUM);
-                     {if (true) return new EFloat(Float.parseFloat(token.image));}
+        {if (true) return new EFloat(Float.parseFloat(token.image));}
         break;
       case TRUE:
         jj_consume_token(TRUE);
-              {if (true) return new ETrue();}
+        {if (true) return new ETrue();}
         break;
       case FALSE:
         jj_consume_token(FALSE);
-               {if (true) return new EFalse();}
+        {if (true) return new EFalse();}
         break;
       default:
         jj_la1[3] = jj_gen;
@@ -150,7 +154,7 @@ public class Lugosi implements LugosiConstants {
   }
 
   static final public String OP() throws ParseException {
-  Token token;
+    Token token;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case PLUS:
       token = jj_consume_token(PLUS);
@@ -190,14 +194,14 @@ public class Lugosi implements LugosiConstants {
       jj_consume_token(-1);
       throw new ParseException();
     }
-      {if (true) return token.image;}
+        {if (true) return token.image;}
     throw new Error("Missing return statement in function");
   }
 
-  static final public ArrayList<Exp> ListaExpressao() throws ParseException {
- ArrayList<Exp> exps = new ArrayList<Exp>(); Exp e;
+  static final public ArrayList < Exp > ListaExpressao() throws ParseException {
+    ArrayList < Exp > exps = new ArrayList < Exp > ();Exp e;
     e = EXP();
-               exps.add(e);
+            exps.add(e);
     label_1:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -210,14 +214,14 @@ public class Lugosi implements LugosiConstants {
       }
       jj_consume_token(VIRGULA);
       e = EXP();
-                                                   exps.add(e);
+            exps.add(e);
     }
-     {if (true) return exps;}
+            {if (true) return exps;}
     throw new Error("Missing return statement in function");
   }
 
-  static final public ArrayList<Fun> Fun() throws ParseException {
- ArrayList<Fun> fun = new ArrayList<Fun>(); String nome; ArrayList<ParamFormalFun> params;String retorno; ArrayList<VarDecl> vars;ArrayList<Comando> body;
+  static final public ArrayList < Fun > Fun() throws ParseException {
+    ArrayList < Fun > fun = new ArrayList < Fun > ();String nome;ArrayList < ParamFormalFun > params;String retorno;ArrayList < VarDecl > vars;ArrayList < Comando > body;
     label_2:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -238,17 +242,19 @@ public class Lugosi implements LugosiConstants {
       vars = VarDecl();
       body = SeqComandos();
       jj_consume_token(FCHAVES);
-                                                                                                                         fun.add(new Fun(nome, params, retorno, vars, body));
+            fun.add(new Fun(nome, params, retorno, vars, body));
     }
-     {if (true) return fun;}
+        {if (true) return fun;}
     throw new Error("Missing return statement in function");
   }
 
-  static final public ArrayList<ParamFormalFun> ListaArg() throws ParseException {
- ArrayList<ParamFormalFun> params = new ArrayList<ParamFormalFun>(); String type; String var;
+  static final public ArrayList < ParamFormalFun > ListaArg() throws ParseException {
+    ArrayList < ParamFormalFun > params = new ArrayList < ParamFormalFun > ();String type;String
+    var;
     type = Tipo();
     var = jj_consume_token(ID).image;
-                                    params.add(new ParamFormalFun(type, var));
+            params.add(new ParamFormalFun(type,
+                var));
     label_3:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -262,14 +268,15 @@ public class Lugosi implements LugosiConstants {
       jj_consume_token(VIRGULA);
       type = Tipo();
       var = jj_consume_token(ID).image;
-                                                                                                                     params.add(new ParamFormalFun(type, var));
+                params.add(new ParamFormalFun(type,
+                    var));
     }
-     {if (true) return params;}
+            {if (true) return params;}
     throw new Error("Missing return statement in function");
   }
 
   static final public Exp EXP() throws ParseException {
- Exp arg1; String op; Exp arg2; Exp fator;
+    Exp arg1;String op;Exp arg2;Exp fator;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case APAREN:
       jj_consume_token(APAREN);
@@ -277,14 +284,14 @@ public class Lugosi implements LugosiConstants {
       op = OP();
       arg2 = EXP();
       jj_consume_token(FPAREN);
-                                                 {if (true) return new EOpExp(op, arg1, arg2);}
+        {if (true) return new EOpExp(op, arg1, arg2);}
       break;
     case TRUE:
     case FALSE:
     case NUM:
     case ID:
       fator = Fator();
-                       {if (true) return fator;}
+        {if (true) return fator;}
       break;
     default:
       jj_la1[8] = jj_gen;
@@ -295,20 +302,20 @@ public class Lugosi implements LugosiConstants {
   }
 
   static final public Comando Comando() throws ParseException {
- Token token; Exp exp; ArrayList<Comando> coms = new ArrayList<Comando>(); ArrayList<Exp> args;
+    Token token;Exp exp;ArrayList < Comando > coms = new ArrayList < Comando > ();ArrayList < Exp > args;
     if (jj_2_2(3)) {
       token = jj_consume_token(ID);
       jj_consume_token(ATRIBUICAO);
       exp = EXP();
       jj_consume_token(PONTOVIRGULA);
-                                                                       {if (true) return new CAtribuicao(token.beginLine, token.image, exp);}
+        {if (true) return new CAtribuicao(token.beginLine, token.image, exp);}
     } else if (jj_2_3(2)) {
       token = jj_consume_token(ID);
       jj_consume_token(APAREN);
       args = ListaExpressao();
       jj_consume_token(FPAREN);
       jj_consume_token(PONTOVIRGULA);
-                                                                                          {if (true) return new CChamadaFun(token.beginLine, token.image, args);}
+        {if (true) return new CChamadaFun(token.beginLine, token.image, args);}
     } else {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case IF:
@@ -318,7 +325,7 @@ public class Lugosi implements LugosiConstants {
         coms = SeqComandos();
         jj_consume_token(FCHAVES);
         jj_consume_token(PONTOVIRGULA);
-                                                                                        {if (true) return new CIf(token.beginLine, exp, coms);}
+        {if (true) return new CIf(token.beginLine, exp, coms);}
         break;
       case WHILE:
         token = jj_consume_token(WHILE);
@@ -328,7 +335,7 @@ public class Lugosi implements LugosiConstants {
         coms = SeqComandos();
         jj_consume_token(FCHAVES);
         jj_consume_token(PONTOVIRGULA);
-                                                                                                {if (true) return new CWhile(token.beginLine, exp, coms);}
+        {if (true) return new CWhile(token.beginLine, exp, coms);}
         break;
       default:
         jj_la1[9] = jj_gen;
@@ -338,20 +345,20 @@ public class Lugosi implements LugosiConstants {
           jj_consume_token(READIO);
           jj_consume_token(APAREN);
           jj_consume_token(FPAREN);
-                                                                         {if (true) return new CReadInput(token.beginLine, token.image);}
+        {if (true) return new CReadInput(token.beginLine, token.image);}
         } else {
           switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
           case RETURN:
             token = jj_consume_token(RETURN);
             exp = EXP();
             jj_consume_token(PONTOVIRGULA);
-                                                   {if (true) return new CReturn(token.beginLine, exp);}
+        {if (true) return new CReturn(token.beginLine, exp);}
             break;
           case PRINTIO:
             token = jj_consume_token(PRINTIO);
             exp = EXP();
             jj_consume_token(PONTOVIRGULA);
-                                                    {if (true) return new CPrint(token.beginLine, exp);}
+        {if (true) return new CPrint(token.beginLine, exp);}
             break;
           default:
             jj_la1[10] = jj_gen;
@@ -392,30 +399,9 @@ public class Lugosi implements LugosiConstants {
     finally { jj_save(3, xla); }
   }
 
-  static private boolean jj_3R_11() {
-    if (jj_scan_token(FALSE)) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_10() {
-    if (jj_scan_token(TRUE)) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_9() {
-    if (jj_scan_token(NUM)) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_8() {
+  static private boolean jj_3_3() {
     if (jj_scan_token(ID)) return true;
-    return false;
-  }
-
-  static private boolean jj_3_4() {
-    if (jj_scan_token(ID)) return true;
-    if (jj_scan_token(ATRIBUICAO)) return true;
-    if (jj_scan_token(READIO)) return true;
+    if (jj_scan_token(APAREN)) return true;
     return false;
   }
 
@@ -444,12 +430,6 @@ public class Lugosi implements LugosiConstants {
     return false;
   }
 
-  static private boolean jj_3_3() {
-    if (jj_scan_token(ID)) return true;
-    if (jj_scan_token(APAREN)) return true;
-    return false;
-  }
-
   static private boolean jj_3_2() {
     if (jj_scan_token(ID)) return true;
     if (jj_scan_token(ATRIBUICAO)) return true;
@@ -457,8 +437,25 @@ public class Lugosi implements LugosiConstants {
     return false;
   }
 
+  static private boolean jj_3R_11() {
+    if (jj_scan_token(FALSE)) return true;
+    return false;
+  }
+
   static private boolean jj_3R_6() {
     if (jj_3R_7()) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_10() {
+    if (jj_scan_token(TRUE)) return true;
+    return false;
+  }
+
+  static private boolean jj_3_4() {
+    if (jj_scan_token(ID)) return true;
+    if (jj_scan_token(ATRIBUICAO)) return true;
+    if (jj_scan_token(READIO)) return true;
     return false;
   }
 
@@ -474,6 +471,16 @@ public class Lugosi implements LugosiConstants {
 
   static private boolean jj_3R_5() {
     if (jj_scan_token(APAREN)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_9() {
+    if (jj_scan_token(NUM)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_8() {
+    if (jj_scan_token(ID)) return true;
     return false;
   }
 

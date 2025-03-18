@@ -2,6 +2,8 @@ javacc Lugosi.jj
 
 javac ast\*.java libs\*.java
 
+calcula o fatorial de um numero.
 java -cp . libs.Lugosi programas-lugosi/factorial.lug
 
+gera os cinco primeiros numeros da sequencia de Fibonacci e calcula sua soma.
 java -cp . libs.Lugosi programas-lugosi/fibonacci.lug

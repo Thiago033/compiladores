@@ -127,7 +127,7 @@ public class GeraCodigo {
 
     // gera o codigo do comando de leitura
     public static void geraReadInput(CReadInput read) {
-        writer.println("    " + read.var+" = input()");
+        writer.println("    " + read.var+" = int(input())");
     }
 
     // gera o codigo da chamada de funcao
